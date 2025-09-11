@@ -1,10 +1,7 @@
 package com.wbf.mutuelle.controllers;
 
 import com.wbf.mutuelle.entities.Contribution;
-import com.wbf.mutuelle.entities.ContributionPeriod;
-import com.wbf.mutuelle.entities.Member;
 import com.wbf.mutuelle.services.ContributionService;
-import com.wbf.mutuelle.services.LoanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,31 +11,32 @@ import java.util.List;
 @RequestMapping("mutuelle/contribution")
 @RequiredArgsConstructor
 public class ContributionController {
+
     private final ContributionService contributionService;
-    private final LoanService loanService;
 
     @GetMapping
-public List<Contribution> getContributions() {
-        return  contributionService.getContributions();
+    public List<Contribution> getContributions() {
+        return contributionService.getAllContributions();
     }
 
-
-    public List<ContributionPeriod> getContributionPeriods() {
-        ContributionPeriod contributionPeriodRepository = new ContributionPeriod();
-        return contributionPeriodRepository.getContributionPeriod();
-    }
     @GetMapping("/{id}")
     public Contribution getContributionById(@PathVariable Long id) {
-        return (Contribution) loanService.getLoanById(id);
+        return contributionService.getContributionById(id)
+                .orElseThrow(() -> new RuntimeException("Contribution not found with id " + id));
     }
 
     @PostMapping
-   public Contribution createContribution(@RequestBody Contribution contribution) {
-       return contributionService.createContribution(contribution);
-    }
-    @PostMapping("/{id}")
-    public Contribution updateContribution(@PathVariable Long id, @RequestBody Contribution contribution) {
-        return contributionService.updateContribution(contribution);
+    public Contribution createContribution(@RequestBody Contribution contribution) {
+        return contributionService.createContribution(contribution);
     }
 
+    @PutMapping("/{id}")
+    public Contribution updateContribution(@PathVariable Long id, @RequestBody Contribution contribution) {
+        return contributionService.updateContribution(id, contribution);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteContribution(@PathVariable Long id) {
+        contributionService.deleteContribution(id);
+    }
 }
