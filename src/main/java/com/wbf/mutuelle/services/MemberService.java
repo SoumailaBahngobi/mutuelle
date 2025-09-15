@@ -31,7 +31,7 @@ public class MemberService {
     public Member updateMember(Long id, Member memberDetails){
      Member member = memberRepository.findById(id).orElseThrow();
      member.setName(memberDetails.getName());
-        member.setFirst_name(memberDetails.getFirst_name());
+        member.setFirstName(memberDetails.getFirstName());
         member.setName(memberDetails.getName());
         member.setEmail(memberDetails.getEmail());
         member.setPassword(memberDetails.getPassword());

@@ -1,0 +1,24 @@
+package com.wbf.mutuelle.services;
+
+import com.wbf.mutuelle.entities.Member;
+import com.wbf.mutuelle.repositories.MemberRepository;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+@Service
+public class CustomUserDetailsService implements UserDetailsService {
+    private final MemberRepository memberRepository;
+
+    public CustomUserDetailsService(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Member member = memberRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
+        return new com.wbf.mutuelle.services.CustomUserDetails(member);
+    }
+}
