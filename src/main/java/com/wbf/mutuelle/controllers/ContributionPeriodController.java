@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("mutuelle/contribution_period")
+@RequestMapping("contribution_period")
 @RequiredArgsConstructor
 
 public class ContributionPeriodController {

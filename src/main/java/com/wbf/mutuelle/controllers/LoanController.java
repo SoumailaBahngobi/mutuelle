@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 
-@RequestMapping("mutuelle/loan")
+@RequestMapping("loan")
 @RequiredArgsConstructor
 public class LoanController {
     private final LoanService loanService;

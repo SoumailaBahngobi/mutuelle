@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("mutuelle/events")
+@RequestMapping("events")
 public class EventController {
 
     @Autowired

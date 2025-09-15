@@ -12,7 +12,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/mutuelle/member")
+@RequestMapping("member")
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("mutuelle/loan_request")
+@RequestMapping("loan_request")
 
 @RequiredArgsConstructor
 public class LoanRequestController {
