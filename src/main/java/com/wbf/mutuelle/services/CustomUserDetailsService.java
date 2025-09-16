@@ -7,8 +7,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
+
     private final MemberRepository memberRepository;
 
     public CustomUserDetailsService(MemberRepository memberRepository) {
@@ -16,9 +19,20 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member member = memberRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
-        return new com.wbf.mutuelle.services.CustomUserDetails(member);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé avec l'email : " + email));
+
+        return new CustomUserDetails(member);
+    }
+
+    //  Méthode pour l'inscription : vérifier si un utilisateur existe
+    public boolean userExists(String email) {
+        return memberRepository.findByEmail(email).isPresent();
+    }
+
+
+    public void saveUser(Member member) {
+        memberRepository.save(member);
     }
 }

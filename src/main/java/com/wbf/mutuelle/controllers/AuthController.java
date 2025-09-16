@@ -3,6 +3,7 @@ package com.wbf.mutuelle.controllers;
 import com.wbf.mutuelle.configuration.JwtUtil;
 import com.wbf.mutuelle.entities.Member;
 import com.wbf.mutuelle.repositories.MemberRepository;
+import com.wbf.mutuelle.services.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,18 +37,29 @@ public class AuthController {
         member.setRole(req.getRole() == null ? "MEMBER" : req.getRole().toUpperCase());
 
         memberRepository.save(member);
-        return ResponseEntity.ok("User registered successfully");
-    }
 
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
-        // authenticate (username = email)
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
-        );
+        CustomUserDetails userDetails = new CustomUserDetails(member);
+        String token = jwtUtil.generateToken(String.valueOf(userDetails));
 
-        // if no exception, generate token
-        String token = jwtUtil.generateToken(authRequest.getUsername());
         return ResponseEntity.ok(new AuthResponse(token));
+    }
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            authRequest.getUsername(),
+                            authRequest.getPassword()
+                    )
+            );
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            String token = jwtUtil.generateToken(String.valueOf(userDetails));
+            //CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            //String token = jwtUtil.generateToken(userDetails);
+
+            return ResponseEntity.ok(new AuthResponse(token));
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("Email ou mot de passe invalide.");
+        }
     }
 }
