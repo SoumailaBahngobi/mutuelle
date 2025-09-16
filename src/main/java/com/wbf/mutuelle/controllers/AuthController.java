@@ -5,6 +5,7 @@ import com.wbf.mutuelle.entities.Member;
 import com.wbf.mutuelle.repositories.MemberRepository;
 import com.wbf.mutuelle.services.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,50 +17,42 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
-    private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @PostMapping("/login")
+    public String login(@RequestBody AuthRequest request) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+        );
+        return jwtUtil.generateToken(request.getEmail());
+    }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
-        if (memberRepository.findAll().stream().anyMatch(m -> m.getEmail().equalsIgnoreCase(req.getEmail()))) {
-            return ResponseEntity.badRequest().body("Email already in use");
+    public Member register(@RequestBody RegisterRequest request) {
+        if (memberRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new RuntimeException("Email déjà utilisé !");
         }
 
         Member member = new Member();
-        member.setName(req.getName());
-        member.setFirstName(req.getFirstName());
-        member.setEmail(req.getEmail());
-        member.setPassword(passwordEncoder.encode(req.getPassword()));
-        member.setPhone(req.getPhone());
-        member.setRole(req.getRole() == null ? "MEMBER" : req.getRole().toUpperCase());
+        member.setName(request.getName());
+        member.setFirstName(request.getFirstName());
+        member.setEmail(request.getEmail());
+        member.setPassword(passwordEncoder.encode(request.getPassword())); // mot de passe hashé
+        member.setNpi(request.getNpi());
+        member.setPhone(request.getPhone());
+        member.setRole(request.getRole());
 
-        memberRepository.save(member);
-
-        CustomUserDetails userDetails = new CustomUserDetails(member);
-        String token = jwtUtil.generateToken(String.valueOf(userDetails));
-
-        return ResponseEntity.ok(new AuthResponse(token));
+        return memberRepository.save(member);
     }
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            authRequest.getUsername(),
-                            authRequest.getPassword()
-                    )
-            );
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            String token = jwtUtil.generateToken(String.valueOf(userDetails));
-            //CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            //String token = jwtUtil.generateToken(userDetails);
 
-            return ResponseEntity.ok(new AuthResponse(token));
-        } catch (Exception e) {
-            return ResponseEntity.status(401).body("Email ou mot de passe invalide.");
-        }
-    }
 }

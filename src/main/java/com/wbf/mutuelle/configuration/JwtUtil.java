@@ -12,21 +12,25 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256); // clé générée au démarrage
+    private final String SECRET = "MaSuperCleSecreteQuiDoitEtreTresLongue123456789"; // à changer en + sécurisé
+    private final long EXPIRATION_TIME = 1000 * 60 * 60; // 1h
 
-    public String generateToken(String username) {
-        Date now = new Date();
-        long validityInMs = 1000 * 60 * 60 * 24; // 24h
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + validityInMs))
-                .signWith(key)
-                .compact();
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
-    public String extractUsername(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build()
+    public String generateToken(String email) {
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+    public String extractEmail(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
@@ -34,10 +38,11 @@ public class JwtUtil {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
+        } catch (JwtException e) {
             return false;
         }
     }
+
 }
