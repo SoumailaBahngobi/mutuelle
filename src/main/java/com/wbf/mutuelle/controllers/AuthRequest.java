@@ -1,12 +1,13 @@
 package com.wbf.mutuelle.controllers;
 
+import com.wbf.mutuelle.entities.Role;
 import lombok.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 
 
 @Setter
-@RequestMapping("/auth")
+@RequestMapping("/mut")
 public class AuthRequest {
 
     private String name;
@@ -44,33 +45,25 @@ public class AuthRequest {
         this.phone = phone;
     }
 
-    public String getRole() {
+    public Enum<Role> getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
     private String npi;
     private String phone;
-    private String role;
+    private Role role;
     private String email;
 
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getEmail() {
         return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     private String password;

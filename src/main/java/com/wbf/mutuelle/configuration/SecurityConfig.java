@@ -25,8 +25,14 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/members/**").hasAuthority("ADMIN") // ou .hasRole("ADMIN") si tu mets ROLE_ADMIN en DB
+                        .requestMatchers("/mut/**").permitAll()
+
+                        // Accès pour les rôles
+                        .requestMatchers("/members/**").hasAnyRole("MEMBER", "PRESIDENT", "SECRETARY", "TREASURER")
+                        .requestMatchers("/president/**").hasRole("PRESIDENT")
+                        .requestMatchers("/secretary/**").hasAnyRole("SECRETARY", "PRESIDENT")
+                        .requestMatchers("/treasurer/**").hasAnyRole("TREASURER", "PRESIDENT")
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

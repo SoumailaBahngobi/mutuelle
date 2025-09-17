@@ -1,6 +1,6 @@
 package com.wbf.mutuelle.controllers;
 
-import lombok.Data;
+import com.wbf.mutuelle.entities.Role;
 
 
 public class RegisterRequest {
@@ -49,11 +49,11 @@ public class RegisterRequest {
         this.phone = phone;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
@@ -68,7 +68,7 @@ public class RegisterRequest {
     private String email;
     private String password;
     private String phone;
-    private String role;
+    private Role role;
     private String npi;
 
 

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class JwtUtil {
@@ -18,7 +20,7 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
-    public String generateToken(String email) {
+    public String generateToken(String email, String name) {
 
         long EXPIRATION_TIME = 1000 * 60 * 60;
         return Jwts.builder()
@@ -45,5 +47,4 @@ public class JwtUtil {
             return false;
         }
     }
-
 }

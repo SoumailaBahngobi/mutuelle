@@ -1,7 +1,6 @@
 package com.wbf.mutuelle.entities;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,8 +17,18 @@ public class Member {
     private String name;
     private String firstName;
     private String email;
+    private String password;
+    private String npi;
+    private String phone;
 
-    public Member(Long id, String name, String firstName, String email, String password, String npi, String phone, String role) {
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    public Member() {
+    }
+
+    public Member(Long id, String name, String firstName, String email,
+                  String password, String npi, String phone, Role role) {
         this.id = id;
         this.name = name;
         this.firstName = firstName;
@@ -28,14 +37,5 @@ public class Member {
         this.npi = npi;
         this.phone = phone;
         this.role = role;
-    }
-
-    private String password;
-    private String npi;
-    private String phone;
-    private String role;
-
-    public Member() {
-
     }
 }
