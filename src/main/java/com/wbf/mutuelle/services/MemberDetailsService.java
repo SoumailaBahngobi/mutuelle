@@ -17,17 +17,6 @@ import java.util.Collections;
 public class MemberDetailsService implements UserDetailsService {
     @Autowired
     private MemberRepository memberRepository;
-/*
-
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé : " + email));
-
-        GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + member.getRole());
-
-        return new User(member.getEmail(), member.getPassword(), Collections.singleton(authority));
-    }
-*/
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Member member = memberRepository.findByEmail(email)

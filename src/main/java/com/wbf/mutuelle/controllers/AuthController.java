@@ -3,9 +3,9 @@ package com.wbf.mutuelle.controllers;
 import com.wbf.mutuelle.configuration.JwtUtil;
 import com.wbf.mutuelle.entities.Member;
 import com.wbf.mutuelle.repositories.MemberRepository;
-import com.wbf.mutuelle.services.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,42 +17,52 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @PostMapping("/login")
-    public String login(@RequestBody AuthRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
-        return jwtUtil.generateToken(request.getEmail());
-    }
+    private final AuthenticationManager authenticationManager;
+    private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/register")
-    public Member register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<?> register(@RequestBody AuthRequest request) {
+        // Vérifie si email déjà utilisé
         if (memberRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Email déjà utilisé !");
+            return ResponseEntity.badRequest().body("Email déjà utilisé !");
         }
 
-        Member member = new Member();
-        member.setName(request.getName());
-        member.setFirstName(request.getFirstName());
-        member.setEmail(request.getEmail());
-        member.setPassword(passwordEncoder.encode(request.getPassword())); // mot de passe hashé
-        member.setNpi(request.getNpi());
-        member.setPhone(request.getPhone());
-        member.setRole(request.getRole());
+        // Créer utilisateur
+        Member user = new Member();
+        user.setEmail(request.getEmail());
+        user.setName(request.getName());
+        user.setFirstName(request.getFirstName());
+        user.setNpi(request.getNpi());
+        user.setPhone(request.getPhone());
+        user.setRole(request.getRole());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        memberRepository.save(user);
 
-        return memberRepository.save(member);
+        // Générer un token après enregistrement
+        String token = jwtUtil.generateToken(user.getEmail());
+
+        // Renvoyer token dans la réponse
+        return ResponseEntity.ok(new AuthResponse(token));
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
+        try {
+            // Vérifie les identifiants
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Identifiants incorrects !");
+        }
+
+        // Génère token si login ok
+        String token = jwtUtil.generateToken(request.getEmail());
+        return ResponseEntity.ok(new AuthResponse(token));
+    }
 }

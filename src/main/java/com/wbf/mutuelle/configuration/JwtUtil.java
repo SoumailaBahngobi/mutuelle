@@ -12,14 +12,15 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private final String SECRET = "MaSuperCleSecreteQuiDoitEtreTresLongue123456789"; // à changer en + sécurisé
-    private final long EXPIRATION_TIME = 1000 * 60 * 60; // 1h
-
     private Key getSigningKey() {
+        // à changer en + sinecurist
+        String SECRET = "MaSuperCleSecreteQuiDoitEtreTresLongue123456789";
         return Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
     public String generateToken(String email) {
+
+        long EXPIRATION_TIME = 1000 * 60 * 60;
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
