@@ -54,9 +54,13 @@ public class LoanRequestService {
         if (loanRequest.getStatus() == null) {
             loanRequest.setStatus("PENDING");
         }
-        if (loanRequest.getIsRepaid() == null) {
+      /*  if (loanRequest.getIsRepaid() == null) {
             loanRequest.setIsRepaid(false);
-        }
+        }*/
+if (loanRequest.getIs_repaid() == null )  {
+    loanRequest.setIs_repaid(false);
+
+}
 
         return loanRequestRepository.save(loanRequest);
     }
@@ -67,7 +71,8 @@ public class LoanRequestService {
             existingRequest.setDuration(updatedRequest.getDuration());
             existingRequest.setReason(updatedRequest.getReason());
             existingRequest.setStatus(updatedRequest.getStatus());
-            existingRequest.setIsRepaid(updatedRequest.getIsRepaid());
+            existingRequest.setIs_repaid(updatedRequest.getIs_repaid());
+           // existingRequest.setIsRepaid(updatedRequest.getIsRepaid());
             return loanRequestRepository.save(existingRequest);
         }).orElseThrow(() -> new RuntimeException("Demande de prêt non trouvée avec l'id " + id));
     }

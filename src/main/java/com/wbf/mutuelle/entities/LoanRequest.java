@@ -24,11 +24,11 @@ public class LoanRequest {
     private BigDecimal request_amount;
 
     public Boolean getRepaid() {
-        return isRepaid;
+        return is_repaid;
     }
 
     public void setRepaid(Boolean repaid) {
-        isRepaid = repaid;
+        is_repaid = repaid;
     }
 
     @Column(nullable = false)
@@ -40,8 +40,16 @@ public class LoanRequest {
     @Column(nullable = false)
     private String status = "PENDING";
 
+    public Boolean getIs_repaid() {
+        return is_repaid;
+    }
+
+    public void setIs_repaid(Boolean is_repaid) {
+        this.is_repaid = is_repaid;
+    }
+
     @Column(name = "is_repaid")
-    private Boolean isRepaid = false;
+    private Boolean is_repaid = false;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "request_date", nullable = false)
@@ -51,13 +59,21 @@ public class LoanRequest {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    public LoanRequest( BigDecimal request_amount, Integer duration, String reason, String status, Boolean isRepaid, Date request_date, Member member) {
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public LoanRequest(BigDecimal request_amount, Integer duration, String reason, String status, Boolean is_repaid, Date request_date, Member member) {
 
         this.request_amount = request_amount;
         this.duration = duration;
         this.reason = reason;
         this.status = status;
-        this.isRepaid = isRepaid;
+        this.is_repaid = is_repaid;
         this.request_date = request_date;
         this.member = member;
     }
