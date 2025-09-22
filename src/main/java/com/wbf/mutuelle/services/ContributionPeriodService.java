@@ -28,10 +28,12 @@ public class ContributionPeriodService {
 
     public ContributionPeriod update(Long id, ContributionPeriod updated) {
         return repository.findById(id).map(existing -> {
-            existing.setBeginDate(updated.getBeginDate());
+            existing.setStartDate(updated.getStartDate());
+
             existing.setEndDate(updated.getEndDate());
-            existing.setFixedAmount(updated.getFixedAmount());
-            existing.setActive(updated.getActive());
+            existing.setIndividualAmount(updated.getIndividualAmount());
+            existing.setActive(updated.isActive());
+
             return repository.save(existing);
         }).orElseThrow(() -> new RuntimeException("Période non trouvée avec id " + id));
     }

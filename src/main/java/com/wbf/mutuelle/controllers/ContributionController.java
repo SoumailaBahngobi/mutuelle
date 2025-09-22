@@ -1,6 +1,7 @@
 package com.wbf.mutuelle.controllers;
 
 import com.wbf.mutuelle.entities.Contribution;
+import com.wbf.mutuelle.entities.ContributionPeriod;
 import com.wbf.mutuelle.entities.ContributionType;
 import com.wbf.mutuelle.entities.Member;
 import com.wbf.mutuelle.repositories.MemberRepository;
@@ -12,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -189,16 +191,13 @@ public class ContributionController {
 
             List<Contribution> contributions = contributionService.getIndividualContributionsByMember(connectedMember.getId());
             return ResponseEntity.ok(contributions);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(List.of());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-
     }
 
     // Obtenir les contributions groupées du membre connecté
-    @GetMapping("/group/my-contributions")
+    @GetMapping("/group/my_contributions")
     public ResponseEntity<List<Contribution>> getMyGroupContributions(@AuthenticationPrincipal UserDetails userDetails) {
         try {
             Member connectedMember = memberRepository.findByEmail(userDetails.getUsername())
@@ -206,10 +205,87 @@ public class ContributionController {
 
             List<Contribution> contributions = contributionService.getGroupContributionsByMember(connectedMember.getId());
             return ResponseEntity.ok(contributions);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(List.of());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    // NOUVEAUX ENDPOINTS POUR LES STATISTIQUES FINANCIÈRES
+
+    /**
+     * Montant total de toutes les contributions
+     */
+    @GetMapping("/total_amount")
+    public ResponseEntity<BigDecimal> getTotalContributionsAmount() {
+        try {
+            BigDecimal totalAmount = contributionService.getTotalContributionsAmount();
+            return ResponseEntity.ok(totalAmount);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(BigDecimal.ZERO);
+        }
+    }
+
+    /**
+     * Montant total des contributions du membre connecté
+     */
+    @GetMapping("/my_total_amount")
+    public ResponseEntity<BigDecimal> getMyTotalContributionsAmount(@AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            Member connectedMember = memberRepository.findByEmail(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("Membre non trouvé !"));
+
+            BigDecimal totalAmount = contributionService.getTotalContributionsAmountByMember(connectedMember.getId());
+            return ResponseEntity.ok(totalAmount);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(BigDecimal.ZERO);
+        }
+    }
+
+    /**
+     * Montant total par type de contribution
+     */
+    @GetMapping("/total_amount/{contributionType}")
+    public ResponseEntity<BigDecimal> getTotalAmountByType(@PathVariable ContributionType contributionType) {
+        try {
+            BigDecimal totalAmount = contributionService.getTotalAmountByType(contributionType);
+            return ResponseEntity.ok(totalAmount);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(BigDecimal.ZERO);
+        }
+    }
+
+    /**
+     * Statistiques complètes
+     */
+    @GetMapping("/statistics")
+    public ResponseEntity<ContributionStatistics> getContributionStatistics() {
+        try {
+            BigDecimal totalAmount = contributionService.getTotalContributionsAmount();
+            BigDecimal individualTotal = contributionService.getTotalAmountByType(ContributionType.INDIVIDUAL);
+            BigDecimal groupTotal = contributionService.getTotalAmountByType(ContributionType.GROUP);
+
+            ContributionStatistics statistics = new ContributionStatistics(totalAmount, individualTotal, groupTotal);
+            return ResponseEntity.ok(statistics);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // Classe interne pour les statistiques
+    public static class ContributionStatistics {
+        private final BigDecimal totalAmount;
+        private final BigDecimal individualAmount;
+        private final BigDecimal groupAmount;
+
+        public ContributionStatistics(BigDecimal totalAmount, BigDecimal individualAmount, BigDecimal groupAmount) {
+            this.totalAmount = totalAmount;
+            this.individualAmount = individualAmount;
+            this.groupAmount = groupAmount;
+        }
+
+        // Getters
+        public BigDecimal getTotalAmount() { return totalAmount; }
+        public BigDecimal getIndividualAmount() { return individualAmount; }
+        public BigDecimal getGroupAmount() { return groupAmount; }
     }
 }
