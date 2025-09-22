@@ -12,10 +12,13 @@ import java.util.List;
 @Repository
 public interface ContributionRepository extends JpaRepository<Contribution, Long> {
 
-    List<Contribution> findByType(ContributionType type);
+    // Méthode de base pour trouver par type
+    List<Contribution> findByContributionType(ContributionType contributionType);
 
-    List<Contribution> findByContributionPeriodId(Long periodId);
+    // Contributions individuelles d'un membre - version très simple
+    List<Contribution> findByContributionTypeAndMemberId(ContributionType contributionType, Long memberId);
 
-    @Query("SELECT c FROM Contribution c LEFT JOIN c.member m LEFT JOIN c.members mem WHERE m.id = :memberId OR mem.id = :memberId")
-    List<Contribution> findByMemberIdOrMembersId(@Param("memberId") Long memberId, @Param("memberId") Long memberId2);
+    // Contributions groupées - on va utiliser une approche différente
+    @Query("SELECT DISTINCT c FROM Contribution c WHERE c.contributionType = :contributionType AND EXISTS (SELECT m FROM c.members m WHERE m.id = :memberId)")
+    List<Contribution> findGroupContributionsByMemberId(@Param("contributionType") ContributionType contributionType, @Param("memberId") Long memberId);
 }
