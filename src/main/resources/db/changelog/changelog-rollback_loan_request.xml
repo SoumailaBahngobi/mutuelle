@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+
+    <!-- Drop Foreign Key Constraints with preconditions -->
+    <changeSet id="1758532322581-20" author="HP">
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyName="fk_conconper_on_contribution"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="contribution_contribution_periods"
+                                  constraintName="fk_conconper_on_contribution"/>
+    </changeSet>
+
+    <changeSet id="1758532322581-21" author="HP">
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyName="fk_conconper_on_contribution_period"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="contribution_contribution_periods"
+                                  constraintName="fk_conconper_on_contribution_period"/>
+    </changeSet>
+
+    <changeSet id="1758532322581-22" author="HP">
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyName="fk_conmem_on_contribution"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="contribution_members" constraintName="fk_conmem_on_contribution"/>
+    </changeSet>
+
+    <changeSet id="1758532322581-23" author="HP">
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyName="fk_conmem_on_member"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="contribution_members" constraintName="fk_conmem_on_member"/>
+    </changeSet>
+
+    <changeSet id="1758532322581-24" author="HP">
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyName="fk_loan_request_on_member"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="loan_request" constraintName="fk_loan_request_on_member"/>
+    </changeSet>
+
+    <changeSet id="1758532322581-25" author="HP">
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyName="fk_reploa_on_repayment"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="repayment_loans" constraintName="fk_reploa_on_repayment"/>
+    </changeSet>
+
+    <changeSet id="1758532322581-26" author="HP">
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyName="fknbmehd7t25jn06jstd6pk1oj7"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="contribution_members" constraintName="fknbmehd7t25jn06jstd6pk1oj7"/>
+    </changeSet>
+
+    <!-- Drop Tables with preconditions -->
+    <changeSet id="1758532322581-28" author="HP">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="contribution_contribution_periods"/>
+        </preConditions>
+        <dropTable cascadeConstraints="true" tableName="contribution_contribution_periods"/>
+    </changeSet>
+
+    <changeSet id="1758532322581-29" author="HP">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="repayment_loans"/>
+        </preConditions>
+        <dropTable cascadeConstraints="true" tableName="repayment_loans"/>
+    </changeSet>
+
+    <!-- Drop Columns with preconditions -->
+    <changeSet id="1758532322581-30" author="HP">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contribution" columnName="id_contribution"/>
+        </preConditions>
+        <dropColumn columnName="id_contribution" tableName="contribution"/>
+    </changeSet>
+
+    <changeSet id="1758532322581-31" author="HP">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="contribution_members" columnName="contribution_id_contribution"/>
+        </preConditions>
+        <dropColumn columnName="contribution_id_contribution" tableName="contribution_members"/>
+        <dropColumn columnName="members_id" tableName="contribution_members"/>
+    </changeSet>
+
+    <!-- Drop Sequences with preconditions -->
+    <changeSet id="1758532322581-33" author="HP">
+        <preConditions onFail="MARK_RAN">
+            <sequenceExists sequenceName="contribution_seq"/>
+        </preConditions>
+        <dropSequence sequenceName="contribution_seq"/>
+    </changeSet>
+
+    <changeSet id="1758532322581-34" author="HP">
+        <preConditions onFail="MARK_RAN">
+            <sequenceExists sequenceName="loan_request_seq"/>
+        </preConditions>
+        <dropSequence sequenceName="loan_request_seq"/>
+    </changeSet>
+
+    <changeSet id="1758532322581-35" author="HP">
+        <preConditions onFail="MARK_RAN">
+            <sequenceExists sequenceName="loan_seq"/>
+        </preConditions>
+        <dropSequence sequenceName="loan_seq"/>
+    </changeSet>
+
+    <!-- Modifications de types de données -->
+    <changeSet id="1758532322581-1" author="HP">
+        <modifyDataType columnName="amount" newDataType="DECIMAL" tableName="contribution"/>
+    </changeSet>
+    <changeSet id="1758532322581-2" author="HP">
+        <modifyDataType columnName="amount" newDataType="DECIMAL" tableName="event"/>
+    </changeSet>
+    <changeSet id="1758532322581-3" author="HP">
+        <modifyDataType columnName="amount" newDataType="DECIMAL" tableName="loan"/>
+    </changeSet>
+    <changeSet id="1758532322581-4" author="HP">
+        <modifyDataType columnName="amount" newDataType="DECIMAL" tableName="repayment"/>
+    </changeSet>
+    <changeSet id="1758532322581-6" author="HP">
+        <modifyDataType columnName="fixed_amount" newDataType="DECIMAL" tableName="contribution_period"/>
+    </changeSet>
+    <changeSet id="1758532322581-11" author="HP">
+        <modifyDataType columnName="repayment_amount" newDataType="DECIMAL" tableName="loan"/>
+    </changeSet>
+    <changeSet id="1758532322581-12" author="HP">
+        <modifyDataType columnName="request_amount" newDataType="DECIMAL" tableName="loan_request"/>
+    </changeSet>
+
+    <!-- Loan Request Fixes -->
+    <changeSet id="1758532322581-5" author="HP">
+        <addNotNullConstraint columnDataType="INT" columnName="duration" tableName="loan_request" validate="true"/>
+    </changeSet>
+
+    <!-- CORRECTION : PostgreSQL compatible auto-increment -->
+    <changeSet id="1758532322581-7" author="HP">
+        <comment>Create sequence for loan_request auto-increment (PostgreSQL compatible)</comment>
+        <createSequence
+                sequenceName="loan_request_id_seq"
+                startValue="1"
+                incrementBy="1"
+                cycle="false"/>
+    </changeSet>
+
+    <changeSet id="1758532322581-7-1" author="HP">
+        <comment>Set sequence as default for id_loan_request</comment>
+        <sql>
+            ALTER TABLE loan_request
+                ALTER COLUMN id_loan_request SET DEFAULT nextval('loan_request_id_seq');
+        </sql>
+    </changeSet>
+
+    <changeSet id="1758532322581-7-2" author="HP">
+        <comment>Initialize sequence with current max value</comment>
+        <sql>
+            SELECT setval('loan_request_id_seq', COALESCE((SELECT MAX(id_loan_request) FROM loan_request), 0) + 1);
+        </sql>
+    </changeSet>
+
+    <changeSet id="1758532322581-8" author="HP">
+        <dropNotNullConstraint columnDataType="boolean" columnName="is_repaid" tableName="loan_request"/>
+    </changeSet>
+    <changeSet id="1758532322581-9" author="HP">
+        <addNotNullConstraint columnDataType="BIGINT" columnName="member_id" tableName="loan_request" validate="true"/>
+    </changeSet>
+    <changeSet id="1758532322581-10" author="HP">
+        <addNotNullConstraint columnDataType="VARCHAR(255)" columnName="reason" tableName="loan_request"
+                              validate="true"/>
+    </changeSet>
+    <changeSet id="1758532322581-13" author="HP">
+        <addNotNullConstraint columnDataType="DECIMAL" columnName="request_amount" tableName="loan_request"
+                              validate="true"/>
+    </changeSet>
+    <changeSet id="1758532322581-14" author="HP">
+        <addNotNullConstraint columnDataType="DATE" columnName="request_date" tableName="loan_request" validate="true"/>
+    </changeSet>
+    <changeSet id="1758532322581-15" author="HP">
+        <addNotNullConstraint columnDataType="VARCHAR(255)" columnName="status" tableName="loan_request"
+                              validate="true"/>
+    </changeSet>
+
+    <!-- CORRECTION : Ajouter la clé primaire AVANT les clés étrangères -->
+    <changeSet id="1758532322581-17" author="HP">
+        <addPrimaryKey columnNames="id" constraintName="pk_contribution" tableName="contribution"/>
+    </changeSet>
+
+    <!-- CORRECTION : Ajouter les clés étrangères APRÈS les clés primaires -->
+    <changeSet id="1758532322581-19" author="HP">
+        <addForeignKeyConstraint baseColumnNames="contribution_id" baseTableName="contribution_members"
+                                 constraintName="fk_conmem_on_contribution" referencedColumnNames="id"
+                                 referencedTableName="contribution"/>
+    </changeSet>
+
+    <!-- Add Foreign Key for loan_request -->
+    <changeSet id="add_loan_request_fk" author="HP">
+        <comment>Add foreign key constraint for loan_request member relation</comment>
+        <addForeignKeyConstraint
+                baseTableName="loan_request"
+                baseColumnNames="member_id"
+                constraintName="fk_loan_request_on_member"
+                referencedTableName="member"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- Ajouter également les autres clés étrangères manquantes si nécessaire -->
+    <changeSet id="add_conmem_on_member_fk" author="HP">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_conmem_on_member"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseTableName="contribution_members"
+                baseColumnNames="member_id"
+                constraintName="fk_conmem_on_member"
+                referencedTableName="member"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>

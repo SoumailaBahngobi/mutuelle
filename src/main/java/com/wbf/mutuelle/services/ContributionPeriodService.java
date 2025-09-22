@@ -2,39 +2,44 @@ package com.wbf.mutuelle.services;
 
 import com.wbf.mutuelle.entities.ContributionPeriod;
 import com.wbf.mutuelle.repositories.ContributionPeriodRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
 @Service
+@RequiredArgsConstructor
 public class ContributionPeriodService {
-    private final ContributionPeriodRepository contribution_period_repository;
 
-    public ContributionPeriodService(ContributionPeriodRepository contribution_period_repository)
-    {
-        this.contribution_period_repository = contribution_period_repository;
-    }
-    public List<ContributionPeriod> getContribution_periods()
-    {
-        return contribution_period_repository.findAll();
-    }
-    public ContributionPeriod getContribution_periodById(Long id)
-    {
-        return contribution_period_repository.findById(id).orElse(null);
+    private final ContributionPeriodRepository repository;
+
+    public List<ContributionPeriod> getAll() {
+        return repository.findAll();
     }
 
-    public ContributionPeriod createContribution_period(ContributionPeriod contribution_period)
-    {
-        return contribution_period_repository.save(contribution_period);
+    public ContributionPeriod getById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Période non trouvée avec id " + id));
     }
 
-    public ContributionPeriod updateContributionPeriod(ContributionPeriod contribution_period)
-    {
-        return contribution_period_repository.save(contribution_period);
+    public ContributionPeriod create(ContributionPeriod period) {
+        return repository.save(period);
     }
-    public void deleteContribution_period(Long id)
-    {
-        contribution_period_repository.deleteById(id);
+
+    public ContributionPeriod update(Long id, ContributionPeriod updated) {
+        return repository.findById(id).map(existing -> {
+            existing.setBeginDate(updated.getBeginDate());
+            existing.setEndDate(updated.getEndDate());
+            existing.setFixedAmount(updated.getFixedAmount());
+            existing.setActive(updated.getActive());
+            return repository.save(existing);
+        }).orElseThrow(() -> new RuntimeException("Période non trouvée avec id " + id));
+    }
+
+    public void delete(Long id) {
+        if (!repository.existsById(id)) {
+            throw new RuntimeException("Impossible de supprimer : période avec id " + id + " inexistante.");
+        }
+        repository.deleteById(id);
     }
 }

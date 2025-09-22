@@ -12,7 +12,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("member")
+@RequestMapping("mut/member")
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;

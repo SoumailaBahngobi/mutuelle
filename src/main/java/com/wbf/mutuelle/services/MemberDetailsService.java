@@ -1,7 +1,7 @@
 package com.wbf.mutuelle.services;
 
-import com.wbf.mutuelle.entities.Member;
-import com.wbf.mutuelle.repositories.MemberRepository;
+import java.util.Collections;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,24 +11,20 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+import com.wbf.mutuelle.entities.Member;
+import com.wbf.mutuelle.repositories.MemberRepository;
 
 @Service
 public class MemberDetailsService implements UserDetailsService {
+
+    private final MemberRepository memberRepository;
+
     @Autowired
-    private MemberRepository memberRepository;
-    /*@Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé : " + email));
+    public MemberDetailsService(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
+    }
 
-        return new User(
-                member.getEmail(),
-                member.getPassword(),
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + member.getRole()))
-        );
-    }*/
-
+    @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé : " + email));
@@ -45,5 +41,4 @@ public class MemberDetailsService implements UserDetailsService {
                 Collections.singletonList(authority)
         );
     }
-
 }

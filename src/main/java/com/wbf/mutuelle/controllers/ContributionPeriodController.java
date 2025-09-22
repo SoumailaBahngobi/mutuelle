@@ -1,46 +1,41 @@
 package com.wbf.mutuelle.controllers;
 
 import com.wbf.mutuelle.entities.ContributionPeriod;
-import com.wbf.mutuelle.repositories.ContributionPeriodRepository;
 import com.wbf.mutuelle.services.ContributionPeriodService;
-import com.wbf.mutuelle.services.ContributionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("contribution_period")
+@RequestMapping("mut/cp")
 @RequiredArgsConstructor
-
 public class ContributionPeriodController {
 
-    private final ContributionPeriodService contributionPeriodService;
-    private final ContributionService contributionService;
+    private final ContributionPeriodService service;
 
     @GetMapping
-public List<ContributionPeriod> getContributionPeriods() {
- return contributionPeriodService.getContribution_periods();
- }
- @GetMapping("/{id}")
-    public ContributionPeriod getContributionPeriodById(@PathVariable Long id) {
-        return contributionPeriodService.getContribution_periodById(id);
- }
+    public List<ContributionPeriod> getAll() {
+        return service.getAll();
+    }
 
- //@PostMapping("/contribution_period")
- @PostMapping("")
-  public ContributionPeriod createContributionPeriod(@RequestBody ContributionPeriod contributionPeriod) {
-        return contributionPeriodService.createContribution_period(contributionPeriod);
- }
+    @GetMapping("/{id}")
+    public ContributionPeriod getById(@PathVariable Long id) {
+        return service.getById(id);
+    }
 
- @PostMapping("/{id}")
-    public ContributionPeriod updateContributionPeriod(@PathVariable Long id, @RequestBody ContributionPeriod contributionPeriod) {
-        return contributionPeriodService.updateContributionPeriod(contributionPeriod);
- }
+    @PostMapping
+    public ContributionPeriod create(@RequestBody ContributionPeriod period) {
+        return service.create(period);
+    }
 
- @DeleteMapping("/{id}")
-  public void deleteContributionPeriod(@PathVariable Long id) {
-        contributionPeriodService.deleteContribution_period(id);
- }
+    @PutMapping("/{id}")
+    public ContributionPeriod update(@PathVariable Long id, @RequestBody ContributionPeriod period) {
+        return service.update(id, period);
+    }
 
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
+    }
 }

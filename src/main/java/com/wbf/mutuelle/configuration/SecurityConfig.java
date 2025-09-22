@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
@@ -25,15 +26,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/mut/**").permitAll()
-
-                        // Accès pour les rôles
-                        .requestMatchers("/members/**").hasAnyRole("MEMBER", "PRESIDENT", "SECRETARY", "TREASURER")
-                        .requestMatchers("/president/**").hasRole("PRESIDENT")
-                        .requestMatchers("/secretary/**").hasAnyRole("SECRETARY", "PRESIDENT")
-                        .requestMatchers("/treasurer/**").hasAnyRole("TREASURER", "PRESIDENT")
-
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll() // TEMPORAIRE - à retirer après les tests
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -50,5 +43,4 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }

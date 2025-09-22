@@ -1,6 +1,10 @@
 package com.wbf.mutuelle.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -10,49 +14,64 @@ import java.util.List;
 @Table(name = "contribution")
 public class Contribution {
 
+    @Setter
+    @Getter
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id_contribution;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @Getter
+    private ContributionType contributionType;
+
+    @Setter
     @Temporal(TemporalType.DATE)
-    private Date payment_date;
+    private Date paymentDate;
 
     private BigDecimal amount;
-    private String payment_mode;
-    private String payment_proof;
+    private String paymentMode;
+    private String paymentProof;
 
+    // Type de cotisation (individuelle ou groupée)
+    @Enumerated(EnumType.STRING)
+    private ContributionType type;
+
+    //Cas INDIVIDUELLE
+    @ManyToOne
+    @JoinColumn(name = "member_id", nullable = true)
+    private Member member;
+
+    //Cas GROUPEE
     @ManyToMany
     @JoinTable(
-            name = "contribution_member",
+            name = "contribution_members",
             joinColumns = @JoinColumn(name = "contribution_id"),
             inverseJoinColumns = @JoinColumn(name = "member_id")
     )
     private List<Member> members;
 
-    @ManyToMany
-    @JoinTable(
-            name = "contribution_contribution_period",
-            joinColumns = @JoinColumn(name = "contribution_id"),
-            inverseJoinColumns = @JoinColumn(name = "contribution_period_id")
-    )
-    private List<ContributionPeriod> contribution_periods;
+    // Une cotisation est toujours rattachée à une période
+    @ManyToOne
+    @JoinColumn(name = "contribution_period_id")
+    private ContributionPeriod contributionPeriod;
 
-    // --- Getters & Setters ---
+    // Remove this conflicting setter - DELETE THIS METHOD
+    /*
+    public void setMembers(Object o) {
+    }
+    */
 
-    public Long getId_contribution() {
-        return id_contribution;
+    // Keep only this proper setter
+    public void setMembers(List<Member> members) {
+        this.members = members;
     }
 
-    public void setId_contribution(Long id_contribution) {
-        this.id_contribution = id_contribution;
+    // Your other getters and setters remain the same...
+    public ContributionType getContributionType() {
+        return contributionType;
     }
 
-    public Date getPayment_date() {
-        return payment_date;
-    }
-
-    public void setPayment_date(Date payment_date) {
-        this.payment_date = payment_date;
+    public void setContributionType(ContributionType contributionType) {
+        this.contributionType = contributionType;
     }
 
     public BigDecimal getAmount() {
@@ -63,35 +82,51 @@ public class Contribution {
         this.amount = amount;
     }
 
-    public String getPayment_mode() {
-        return payment_mode;
+    public Date getPaymentDate() {
+        return paymentDate;
     }
 
-    public void setPayment_mode(String payment_mode) {
-        this.payment_mode = payment_mode;
+    public String getPaymentMode() {
+        return paymentMode;
     }
 
-    public String getPayment_proof() {
-        return payment_proof;
+    public void setPaymentMode(String paymentMode) {
+        this.paymentMode = paymentMode;
     }
 
-    public void setPayment_proof(String payment_proof) {
-        this.payment_proof = payment_proof;
+    public String getPaymentProof() {
+        return paymentProof;
+    }
+
+    public void setPaymentProof(String paymentProof) {
+        this.paymentProof = paymentProof;
+    }
+
+    public ContributionType getType() {
+        return type;
+    }
+
+    public void setType(ContributionType type) {
+        this.type = type;
+    }
+
+    public Member getMember() {
+        return member;
     }
 
     public List<Member> getMembers() {
         return members;
     }
 
-    public void setMembers(List<Member> members) {
-        this.members = members;
+    public ContributionPeriod getContributionPeriod() {
+        return contributionPeriod;
     }
 
-    public List<ContributionPeriod> getContribution_periods() {
-        return contribution_periods;
+    public void setContributionPeriod(ContributionPeriod contributionPeriod) {
+        this.contributionPeriod = contributionPeriod;
     }
 
-    public void setContribution_periods(List<ContributionPeriod> contribution_periods) {
-        this.contribution_periods = contribution_periods;
+    public void setMember(Member connectedMember) {
+        this.member = connectedMember;
     }
 }

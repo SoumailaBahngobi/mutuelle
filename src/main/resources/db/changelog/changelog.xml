@@ -6,4 +6,6 @@
                       https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd">
 
     <include file="db/changelog/changelog-init.xml"/>
+    <include file="db/changelog/changelog-rollback_loan_request.xml"/>
+
 </databaseChangeLog>

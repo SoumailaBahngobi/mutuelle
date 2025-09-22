@@ -1,15 +1,16 @@
 package com.wbf.mutuelle.repositories;
 
-import com.wbf.mutuelle.entities.Member;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import com.wbf.mutuelle.entities.Member;
 
 @Repository
 public interface MemberRepository extends JpaRepository<Member,Long> {
         Optional<Member> findByEmail(String email);
+        boolean existsByEmail(String email);
 
 
 }

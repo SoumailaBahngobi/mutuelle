@@ -2,44 +2,56 @@ package com.wbf.mutuelle.services;
 
 import com.wbf.mutuelle.entities.Contribution;
 import com.wbf.mutuelle.repositories.ContributionRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ContributionService {
+
     private final ContributionRepository contributionRepository;
 
-    public ContributionService(ContributionRepository contributionRepository) {
-        this.contributionRepository = contributionRepository;
-    }
-
+    //  Récupérer toutes les contributions
     public List<Contribution> getAllContributions() {
         return contributionRepository.findAll();
     }
 
-    public Optional<Contribution> getContributionById(long id) {
-        return contributionRepository.findById(id);
+    //  Récupérer une contribution par ID
+    public Contribution getContributionById(Long id) {
+        return contributionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Contribution non trouvée avec l'id " + id));
     }
 
+
+    // Créer une nouvelle contribution
     public Contribution createContribution(Contribution contribution) {
         return contributionRepository.save(contribution);
     }
 
+    //  Mettre à jour une contribution
     public Contribution updateContribution(Long id, Contribution updatedContribution) {
         return contributionRepository.findById(id).map(existingContribution -> {
             existingContribution.setAmount(updatedContribution.getAmount());
-            existingContribution.setPayment_date(updatedContribution.getPayment_date());
-            existingContribution.setPayment_mode(updatedContribution.getPayment_mode());
-            existingContribution.setPayment_proof(updatedContribution.getPayment_proof());
+            existingContribution.setPaymentDate(updatedContribution.getPaymentDate());
+            existingContribution.setPaymentMode(updatedContribution.getPaymentMode());
+            existingContribution.setPaymentProof(updatedContribution.getPaymentProof());
+            existingContribution.setContributionPeriod(updatedContribution.getContributionPeriod());
             existingContribution.setMembers(updatedContribution.getMembers());
-            existingContribution.setContribution_periods(updatedContribution.getContribution_periods());
+            existingContribution.setType(updatedContribution.getType()); // ⚡ ajouter le type
+            existingContribution.setMember(updatedContribution.getMember()); // ⚡ utile pour INDIVIDUELLE
             return contributionRepository.save(existingContribution);
-        }).orElseThrow(() -> new RuntimeException("Contribution not found with id " + id));
+        }).orElseThrow(() -> new RuntimeException("Contribution non trouvée avec l'id " + id));
     }
 
-    public void deleteContribution(long id) {
+    //  Supprimer une contribution
+    public void deleteContribution(Long id) {
+        if (!contributionRepository.existsById(id)) {
+            throw new RuntimeException("Impossible de supprimer : contribution avec id " + id + " inexistante.");
+        }
         contributionRepository.deleteById(id);
     }
+
+
 }
