@@ -9,10 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/mut")
@@ -20,13 +17,13 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder; // Assurez-vous que c'est injecté
     private final JwtUtil jwtUtil;
 
-    public AuthController(AuthenticationManager authenticationManager, 
-                         MemberRepository memberRepository, 
-                         PasswordEncoder passwordEncoder, 
-                         JwtUtil jwtUtil) {
+    public AuthController(AuthenticationManager authenticationManager,
+                          MemberRepository memberRepository,
+                          PasswordEncoder passwordEncoder, // Injection correcte
+                          JwtUtil jwtUtil) {
         this.authenticationManager = authenticationManager;
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
@@ -35,22 +32,28 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody AuthRequest request) {
+        // Vérifie si email déjà utilisé
         if (memberRepository.findByEmail(request.getEmail()).isPresent()) {
             return ResponseEntity.badRequest().body("Email déjà utilisé !");
         }
 
+        // Créer utilisateur avec mot de passe encodé
         Member user = new Member();
         user.setEmail(request.getEmail());
         user.setName(request.getName());
         user.setFirstName(request.getFirstName());
         user.setNpi(request.getNpi());
         user.setPhone(request.getPhone());
-        user.setRole(request.getRole() != null ? (Role) (Role) request.getRole() : Role.MEMBER);
+        user.setRole(request.getRole() != null ? (Role) request.getRole() : Role.MEMBER);
+
+        // IMPORTANT: Encoder le mot de passe avec BCrypt
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        
+
         memberRepository.save(user);
 
+        // Générer un token
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+
         return ResponseEntity.ok(new AuthResponse(token));
     }
 
@@ -71,6 +74,7 @@ public class AuthController {
                 .orElseThrow(() -> new RuntimeException("Utilisateur introuvable !"));
 
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+
         return ResponseEntity.ok(new AuthResponse(token));
     }
 }

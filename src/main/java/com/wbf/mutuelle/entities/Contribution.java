@@ -1,6 +1,7 @@
 package com.wbf.mutuelle.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -51,6 +52,22 @@ public class Contribution {
     @ManyToOne
     @JoinColumn(name = "contribution_period_id")
     private ContributionPeriod contributionPeriod;
+
+    // Méthode pour calculer la balance dynamiquement (ne pas persister)
+    @Transient
+    @JsonIgnore
+    private BigDecimal balance;
+
+    // Getter pour la balance (calculé dynamiquement)
+    public BigDecimal getBalance() {
+        // Cette méthode devrait être implémentée dans le service
+        // qui calculera la somme totale des cotisations
+        return this.balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
+    }
 
     // Constructeurs
     public Contribution() {

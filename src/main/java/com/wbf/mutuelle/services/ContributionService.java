@@ -34,62 +34,7 @@ public class ContributionService {
         return contributionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Contribution non trouvée avec l'ID : " + id));
     }
-/*
-    public Contribution createContribution(Contribution contribution) {
-        try {
-            // Validation de base
-            if (contribution.getContributionPeriod() == null || contribution.getContributionPeriod().getId() == null) {
-                throw new RuntimeException("La période de contribution doit être spécifiée !");
-            }
 
-            // Récupérer la période complète avec le montant individuel
-            ContributionPeriod period = contributionPeriodRepository.findById(contribution.getContributionPeriod().getId())
-                    .orElseThrow(() -> new RuntimeException("Période de contribution non trouvée !"));
-
-            // Calculer le montant selon le type de contribution
-            BigDecimal calculatedAmount = calculateContributionAmount(contribution, period);
-            contribution.setAmount(calculatedAmount);
-
-            // Date de paiement par défaut
-            if (contribution.getPaymentDate() == null) {
-                contribution.setPaymentDate(new java.util.Date());
-            }
-
-            return contributionRepository.save(contribution);
-
-        } catch (Exception e) {
-            log.error("Erreur lors de la création de la contribution", e);
-            throw new RuntimeException("Erreur lors de la création de la contribution : " + e.getMessage());
-        }
-    }*/
-
-    /**
-     * Calcule le montant de la contribution selon le type
-     */
-  /*  private BigDecimal calculateContributionAmount(Contribution contribution, ContributionPeriod period) {
-        BigDecimal individualAmount = period.getIndividualAmount();
-
-        if (individualAmount == null || individualAmount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("Le montant individuel de la période n'est pas défini ou invalide !");
-        }
-
-        if (contribution.getContributionType() == ContributionType.INDIVIDUAL) {
-            // Cotisation individuelle : montant individuel
-            return individualAmount;
-
-        } else if (contribution.getContributionType() == ContributionType.GROUP) {
-            // Cotisation groupée : montant individuel × nombre de membres
-            if (contribution.getMembers() == null || contribution.getMembers().isEmpty()) {
-                throw new RuntimeException("Une cotisation groupée doit avoir au moins un membre !");
-            }
-
-            int numberOfMembers = contribution.getMembers().size();
-            return individualAmount.multiply(BigDecimal.valueOf(numberOfMembers));
-
-        } else {
-            throw new RuntimeException("Type de contribution non supporté !");
-        }
-    }*/
 
     public Contribution updateContribution(Long id, Contribution contributionDetails) {
         try {
@@ -282,6 +227,32 @@ public class ContributionService {
         } else {
             throw new RuntimeException("Type de contribution non supporté !");
         }
+    }
+
+    public BigDecimal calculateMemberBalance(Long memberId) {
+        List<Contribution> contributions = contributionRepository.findByMemberId(memberId);
+        return contributions.stream()
+                .map(Contribution::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    // Calcule la balance totale de toutes les cotisations
+    public BigDecimal calculateTotalBalance() {
+        List<Contribution> allContributions = contributionRepository.findAll();
+        return allContributions.stream()
+                .map(Contribution::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    // Met à jour la balance d'une cotisation après sauvegarde
+    public Contribution saveContributionWithBalance(Contribution contribution) {
+        Contribution savedContribution = contributionRepository.save(contribution);
+
+        // Calculer et définir la balance
+        BigDecimal balance = calculateMemberBalance(savedContribution.getMember().getId());
+        savedContribution.setBalance(balance);
+
+        return savedContribution;
     }
 
 }
