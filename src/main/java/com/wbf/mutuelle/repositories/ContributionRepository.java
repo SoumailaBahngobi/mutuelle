@@ -25,10 +25,20 @@ public interface ContributionRepository extends JpaRepository<Contribution, Long
     List<Contribution> findByMemberId(Long memberId);
 
     // Requête pour calculer la balance totale d'un membre
+    /*
     @Query("SELECT COALESCE(SUM(c.amount), 0) FROM Contribution c WHERE c.member.id = :memberId")
     BigDecimal calculateBalanceByMemberId(@Param("memberId") Long memberId);
 
     // Requête pour la balance totale de tous les membres
     @Query("SELECT COALESCE(SUM(c.amount), 0) FROM Contribution c")
     BigDecimal calculateTotalBalance();
+    */
+    /// ///////////////
+
+    @Query("SELECT COALESCE(SUM(c.amount), 0) FROM Contribution c")
+    BigDecimal calculateTotalBalance();
+
+    // Requête pour calculer la balance d'un membre (contributions individuelles seulement)
+    @Query("SELECT COALESCE(SUM(c.amount), 0) FROM Contribution c WHERE c.member.id = :memberId")
+    BigDecimal calculateBalanceByMemberId(@Param("memberId") Long memberId);
 }

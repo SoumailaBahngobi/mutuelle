@@ -53,21 +53,13 @@ public class Contribution {
     @JoinColumn(name = "contribution_period_id")
     private ContributionPeriod contributionPeriod;
 
-    // Méthode pour calculer la balance dynamiquement (ne pas persister)
-    @Transient
-    @JsonIgnore
-    private BigDecimal balance;
-
     // Getter pour la balance (calculé dynamiquement)
-    public BigDecimal getBalance() {
-        // Cette méthode devrait être implémentée dans le service
-        // qui calculera la somme totale des cotisations
-        return this.balance;
-    }
-
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
-    }
+    // Cette méthode devrait être implémentée dans le service
+    // qui calculera la somme totale des cotisations
+    // Méthode pour calculer la balance dynamiquement (ne pas persister)
+   // @Transient
+   // @JsonIgnore
+    private BigDecimal balance;
 
     // Constructeurs
     public Contribution() {
