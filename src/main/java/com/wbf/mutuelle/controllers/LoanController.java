@@ -11,6 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("mut/loan")
 @RequiredArgsConstructor
+
 public class LoanController {
 
     private final LoanService loanService;
