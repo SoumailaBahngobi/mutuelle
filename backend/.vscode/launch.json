@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-MutuelleApplication<mutuelle>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.wbf.mutuelle.MutuelleApplication",
+            "projectName": "mutuelle",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
